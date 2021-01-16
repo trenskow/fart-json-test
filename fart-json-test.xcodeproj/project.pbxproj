@@ -25,6 +25,7 @@
 /* Begin PBXFileReference section */
 		A19DABDA25B294360003EE78 /* fart-json-test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "fart-json-test"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A19DABDD25B294360003EE78 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		A19DABE525B294D80003EE78 /* fart */ = {isa = PBXFileReference; lastKnownFileType = folder; path = fart; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +58,7 @@
 		A19DABDC25B294360003EE78 /* fart-json-test */ = {
 			isa = PBXGroup;
 			children = (
+				A19DABE525B294D80003EE78 /* fart */,
 				A19DABDD25B294360003EE78 /* main.cpp */,
 			);
 			path = "fart-json-test";
@@ -239,6 +241,7 @@
 		A19DABE225B294360003EE78 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -247,6 +250,7 @@
 		A19DABE325B294360003EE78 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
