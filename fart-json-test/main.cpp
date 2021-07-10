@@ -14,10 +14,10 @@ using namespace fart::serialization;
 size_t skip = 0;
 size_t ran = 0;
 
-Strong<Array<String>> fullPaths(const String& path, const Array<String>& filenames) {
+Array<String> fullPaths(const String& path, const Array<String>& filenames) {
 	return filenames.map<String>([&path](const String& filename, const size_t idx) {
-		return path.mapCString<Strong<String>>([&filename](const char* path) {
-			return filename.mapCString<Strong<String>>([path](const char* filename) {
+		return path.mapCString<String>([&filename](const char* path) {
+			return filename.mapCString<String>([&path](const char* filename) {
 				return String::format("%s%s", path, filename);
 			});
 		});
@@ -58,7 +58,7 @@ void test(const String& path, const Array<String>& filenames, Expectation expect
 
 		ran++;
 
-		filename.substring(path.length())->withCString([](const char* filename) {
+		filename.substring(path.length()).withCString([](const char* filename) {
 			printf("%zu) Testing %s... ", ran, filename);
 		});
 
@@ -68,7 +68,7 @@ void test(const String& path, const Array<String>& filenames, Expectation expect
 		}
 
 		try {
-			JSON::parse(String(File(filename, File::Mode::asRead).readToEnd()));
+			JSON::parse(String(File::open(filename, File::Mode::asRead)->readToEnd()));
 		} catch (DecoderException exception) {
 			decide(expectation, &exception);
 			return;
@@ -94,15 +94,15 @@ int main(int argc, const char * argv[]) {
 
 	auto filenames = File::directoryContent(path);
 
-	auto shouldPass = fullPaths(path, filenames->filter([](const String& filename, const size_t idx) {
+	auto shouldPass = fullPaths(path, filenames.filter([](const String& filename, const size_t idx) {
 		return filename[0] == 'y';
 	}));
 
-	auto shouldFail = fullPaths(path, filenames->filter([](const String& filename, const size_t idx) {
+	auto shouldFail = fullPaths(path, filenames.filter([](const String& filename, const size_t idx) {
 		return filename[0] == 'n';
 	}));
 
-	auto shouldBeIndifferent = fullPaths(path, filenames->filter([](const String& filename, const size_t idx) {
+	auto shouldBeIndifferent = fullPaths(path, filenames.filter([](const String& filename, const size_t idx) {
 		return filename[0] == 'i';
 	}));
 
