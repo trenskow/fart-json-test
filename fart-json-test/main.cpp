@@ -58,7 +58,7 @@ void test(const String& path, const Array<String>& filenames, Expectation expect
 
 		ran++;
 
-		filename.substring(path.length()).withCString([](const char* filename) {
+		filename.substring(path.length())->withCString([](const char* filename) {
 			printf("%zu) Testing %s... ", ran, filename);
 		});
 
