@@ -52,7 +52,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "/Users/trenskow/Desktop/fart-json-test/tests/test_parsing"
+            argument = "$(SRCROOT)/tests/test_parsing"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

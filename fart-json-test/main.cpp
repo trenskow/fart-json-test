@@ -92,7 +92,14 @@ int main(int argc, const char * argv[]) {
 	String path = argv[1];
 	if (path.length() > 0 && path[path.length() - 1] != '/') path.append("/");
 
-	auto filenames = File::directoryContent(path);
+	Array<String> filenames;
+
+	try {
+		filenames = File::directoryContent(path);
+	} catch (Exception& e) {
+		printf("Test suites not found at directory.\n");
+		exit(1);
+	}
 
 	auto shouldPass = fullPaths(path, filenames.filter([](const String& filename, const size_t idx) {
 		return filename[0] == 'y';
