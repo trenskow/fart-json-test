@@ -1,6 +1,6 @@
 [submodule "tests"]
 	path = tests
 	url = https://github.com/nst/JSONTestSuite.git
-[submodule "fart-json-test/fart"]
-	path = fart-json-test/fart
-	url = https://github.com/trenskow/fart.git
+[submodule "foundation"]
+	path = foundation
+	url = git@github.com:trenskow/foundation.git

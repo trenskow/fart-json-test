@@ -5,17 +5,18 @@
 //  Created by Kristian Trenskow on 16/01/2021.
 //
 
-#include "fart/fart.hpp"
+#include "../foundation/src/foundation.hpp"
 
-using namespace fart::io::fs;
-using namespace fart::system;
-using namespace fart::serialization;
+using namespace foundation::system;
+using namespace foundation::serialization;
+using namespace foundation::io::fs;
+using namespace foundation::exceptions::serialization;
 
-size_t skip = 0;
+const size_t skip = 0;
 size_t ran = 0;
 
 Array<String> fullPaths(const String& path, const Array<String>& filenames) {
-	return filenames.map<String>([&path](const String& filename, const size_t idx) {
+	return filenames.map<String>([&path](const String& filename) {
 		return path.mapCString<String>([&filename](const char* path) {
 			return filename.mapCString<String>([&path](const char* filename) {
 				return String::format("%s%s", path, filename);
@@ -40,6 +41,7 @@ enum class Expectation {
 };
 
 void decide(Expectation expectation, const Exception* result) {
+
 	switch (expectation) {
 		case Expectation::pass:
 			if (result == nullptr) pass(); else fail();
@@ -51,9 +53,11 @@ void decide(Expectation expectation, const Exception* result) {
 			if (result == nullptr) pass(); else fail(false);
 			break;
 	}
+
 }
 
 void test(const String& path, const Array<String>& filenames, Expectation expectation) {
+
 	filenames.forEach([&path,&expectation](const String& filename) {
 
 		ran++;
@@ -68,7 +72,7 @@ void test(const String& path, const Array<String>& filenames, Expectation expect
 		}
 
 		try {
-			JSON::parse(String(File::open(filename, File::Mode::asRead)->readToEnd()));
+			JSON().parse(String(File::open(filename, File::Mode::asRead)->readToEnd(), false));
 		} catch (DecoderException exception) {
 			decide(expectation, &exception);
 			return;
@@ -80,11 +84,12 @@ void test(const String& path, const Array<String>& filenames, Expectation expect
 		decide(expectation, nullptr);
 
 	});
+
 }
 
 int main(int argc, const char * argv[]) {
 
-	if (argc == 1 || String(argv[1]) == "--help") {
+	if (argc < 2 || String(argv[1]).equals("--help")) {
 		printf("Usage: fart-json-test [test-suite-directory]\n");
 		exit(1);
 	}
@@ -101,15 +106,15 @@ int main(int argc, const char * argv[]) {
 		exit(1);
 	}
 
-	auto shouldPass = fullPaths(path, filenames.filter([](const String& filename, const size_t idx) {
+	auto shouldPass = fullPaths(path, filenames.filter([](const String& filename) {
 		return filename[0] == 'y';
 	}));
 
-	auto shouldFail = fullPaths(path, filenames.filter([](const String& filename, const size_t idx) {
+	auto shouldFail = fullPaths(path, filenames.filter([](const String& filename) {
 		return filename[0] == 'n';
 	}));
 
-	auto shouldBeIndifferent = fullPaths(path, filenames.filter([](const String& filename, const size_t idx) {
+	auto shouldBeIndifferent = fullPaths(path, filenames.filter([](const String& filename) {
 		return filename[0] == 'i';
 	}));
 
@@ -120,4 +125,5 @@ int main(int argc, const char * argv[]) {
 	printf("All done.\n");
 
 	return 0;
+
 }

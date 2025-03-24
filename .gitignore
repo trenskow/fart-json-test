@@ -1,2 +1,7 @@
 fart-json-test.xcodeproj/xcuserdata
 fart-json-test.xcodeproj/project.xcworkspace/xcuserdata/
+build/
+CMakeCache.txt
+CMakeFiles/
+build.ninja
+cmake_install.cmake
