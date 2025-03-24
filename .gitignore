@@ -5,3 +5,5 @@ CMakeCache.txt
 CMakeFiles/
 build.ninja
 cmake_install.cmake
+.ninja_deps
+.ninja_log

@@ -13,6 +13,7 @@ using namespace foundation::io::fs;
 using namespace foundation::exceptions::serialization;
 
 const size_t skip = 0;
+const bool bail = false;
 size_t ran = 0;
 
 Array<String> fullPaths(const String& path, const Array<String>& filenames) {
@@ -25,13 +26,12 @@ Array<String> fullPaths(const String& path, const Array<String>& filenames) {
 	});
 }
 
-void fail(bool bail = true) {
-	printf("Failed\n");
+bool fail(const String& filename) {
+	filename.withCString([](const char* filename) {
+		printf("Failed: %s\n", filename);
+	});
 	if (bail) exit(1);
-}
-
-void pass() {
-	printf("Passed\n");
+	return true;
 }
 
 enum class Expectation {
@@ -40,48 +40,45 @@ enum class Expectation {
 	indifferent
 };
 
-void decide(Expectation expectation, const Exception* result) {
+bool decide(const String& filename, Expectation expectation, const Exception* result) {
 
 	switch (expectation) {
 		case Expectation::pass:
-			if (result == nullptr) pass(); else fail();
+			if (result != nullptr) return fail(filename);
 			break;
 		case Expectation::fail:
-			if (result != nullptr) pass(); else fail();
+			if (result == nullptr) return fail(filename);
 			break;
 		case Expectation::indifferent:
-			if (result == nullptr) pass(); else fail(false);
 			break;
 	}
 
+	return false;
+
 }
 
-void test(const String& path, const Array<String>& filenames, Expectation expectation) {
+bool test(const String& path, const Array<String>& filenames, Expectation expectation) {
 
-	filenames.forEach([&path,&expectation](const String& filename) {
+	return filenames.reduce<bool>(false, [&path,&expectation](bool result, const String& fullPath) {
 
 		ran++;
 
-		filename.substring(path.length())->withCString([](const char* filename) {
-			printf("%zu) Testing %s... ", ran, filename);
-		});
-
 		if (ran <= skip) {
 			printf("Skipped\n");
-			return;
+			return result;
 		}
+
+		String filename = fullPath.substring(path.length());
 
 		try {
-			JSON().parse(String(File::open(filename, File::Mode::asRead)->readToEnd(), false));
+			JSON().parse(String(File::open(fullPath, File::Mode::asRead)->readToEnd(), false));
 		} catch (DecoderException exception) {
-			decide(expectation, &exception);
-			return;
+			return result || decide(filename, expectation, &exception);
 		} catch (JSONMalformedException exception) {
-			decide(expectation, &exception);
-			return;
+			return result || decide(filename, expectation, &exception);
 		}
 
-		decide(expectation, nullptr);
+		return result || decide(filename, expectation, nullptr);
 
 	});
 
@@ -118,12 +115,12 @@ int main(int argc, const char * argv[]) {
 		return filename[0] == 'i';
 	}));
 
-	test(path, shouldPass, Expectation::pass);
-	test(path, shouldFail, Expectation::fail);
-	test(path, shouldBeIndifferent, Expectation::indifferent);
+	bool result = false;
 
-	printf("All done.\n");
+	result = result || test(path, shouldPass, Expectation::pass);
+	result = result || test(path, shouldFail, Expectation::fail);
+	result = result || test(path, shouldBeIndifferent, Expectation::indifferent);
 
-	return 0;
+	return result ? 1 : 0;
 
 }
